@@ -1,0 +1,108 @@
+CHANGELOG
+=========
+
+Version 3.0
+  - Drop MSIE support
+
+Version 2.03
+  - btter hostname regexp (thanks to Christoph Roeder)
+
+Version 2.02
+  - fix: +/- icon was scaled incorrectly
+  - zapped "gremlin character" which destroyed the script under MSIE
+
+Version 2.01
+  - MSIE 6.0 compatibility, needed lots of branches...
+    expect some more bugs than under Firefox.
+    For installation: see http://gm4ie.com/
+  - Safari compatibility through Creammonkey
+  - focus double clicked passwd field after completion (fixed)
+
+Version 2.00
+  - Ajax compatible (listen for new nodes and node changes)
+  - refactored password field detection and open password composer action
+  - swapped plus/minus icon for action "use full host/top level"
+  - focus double clicked field after completion (buggy)
+  - updated second level domain name list
+
+Version 1.14
+  - fix for FF 1.5, where background overlay would not fit the
+    whole viewport if document height was less than window height.
+
+Version 1.13
+  - fixed tabbing order on some host pages (setting tabindex)
+  - implemented keyboard shortcut for setting domain handling
+    suggested by Sean Howarth (Shift+Ctrl+Arrow-LEFT/RIGHT)
+  - implemented keyboard shortcut to display password in
+    cleartext vs. original password field (Shift+Ctrl+C)
+  New feature: stand alone operation
+  - show generated password in pwdcomposer panel if the
+    host page lacks a password field
+
+Version 1.12
+  - bugfixes and work around bugs in GM 0.5.1..3:
+    (GM_registerMenuCommand is not coded correctly)
+
+Version 1.11
+  - fixed transparent background layer height to full page
+  - partially fixed wrong pwdcomposer icon offset:
+    defer script execution after onload event.
+  - handle window.resize events
+  - first shot at adding shortcut key (SHIFT-CTRL-P) through GM menucommand
+
+Version 1.10 - Deer Park / GM 0.5 compatibility fix
+  Changes contributed by Mark Pilgrim (MAP):
+  - refactored event handlers
+  - other Deer Park compatibility fixes
+
+Version 1.09
+  - temporarily suspend site's key events when using pwdcomposer
+  - bugfix (test for GM_functions)
+
+Version 1.08
+  - position passwdcomposer icon on top 'layer'
+  - increase z-index for layer to 9999 (z-index 1000 is found in the wild!)
+  - @namespace points at an existing web page
+  - UI change: dimmed background, clicking it removes composer panel
+  - show 'verify passwd' field only on pages containing such a field
+
+Version 1.07
+  - logging through GM_Log if available (GM 0.3.3+)
+  - give focus to first updated password field
+  - UI change:  panel has cool rounded corners
+  Changes by Christopher Chan-Nui:
+  - Added second password entry field to optionally validate entry
+    of password
+  - Made ESC abort the password entry frame
+  - Made Enter work in any text field
+  - Removed OK button
+  - Made password field bigger
+
+Version 1.06
+  - Added menu command "Show Password Composer"
+    this is useful whenever the password field is added to the page
+    after the body.onload event; see for example the Backbase login
+    page, which is implemented with AJAX heavy lifting.
+
+Version 1.05
+  - Toggle "ignore sub domains" setting.
+  - Setting is saved in Greasemonkey 0.3.x or newer
+
+Version 1.04
+  - Fixed bug where revealed passwords were
+    not discovered on second invocation of the script
+  - Display editable domain name
+  - Use (edited) domain name for generating passwords
+  - still missing user interface to ignore subdomains,
+    based on Chris Zarate's http://labs.zarate.org/passwd/
+
+Version 1.03
+  - Added feature to show or hide generated passwords
+  - some cleanup in mpwd_doit()
+
+Version 1.02
+  - The Master Password field is activated by typing RETURN
+
+Version 1.01
+  - Initial Greasemonky release
+  - GUID {aca5e547-8307-4ac8-8275-5797bdb5f2c1}
