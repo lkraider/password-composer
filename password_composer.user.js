@@ -164,7 +164,6 @@ var pwdc = {
     // VARS
     tmr: null, // timeout timer
     lastPwdField: null,
-    isMsie: /MSIE/.test(navigator.userAgent),
 
     // METHODS
     addOpener: function(fld) {
@@ -283,18 +282,15 @@ var pwdc = {
         if (pwdc.prefs.topDomain) {
             icn.setAttribute('src', pwdc.icons.icnPlus);
             icn.setAttribute('title', "Using host's top level domain name");
-            if (pwdc.isMsie) icn.style.backgroundColor = "#f77";
         } else {
             icn.setAttribute('src', pwdc.icons.icnMin);
             icn.setAttribute('title', "Using full host name");
-            if (pwdc.isMsie) icn.style.backgroundColor = "#dfd";
         }
         document.getElementById("mpwddomain").setAttribute('value',
             pwdc.getHostname());
     },
 
     toggleClearText: function(val) {
-        if (pwdc.isMsie) return; // not available for MSIE
         if (typeof(val) == 'boolean') {
             // use provided argument {true, false}...
             pwdc.prefs.clearText = val;
@@ -375,7 +371,6 @@ var pwdc = {
                 // every passwd field is set to class "mpwdpasswd" on initialization
                 if (cl.indexOf("mpwdpasswd") != -1) {
                     inp.value = pass;
-                    // FIXME: input.type is readonly in MSIE...
                     try {
                         inp.type = (pwdc.prefs.clearText) ? "text" : "password";
                     } catch (e) {}
@@ -396,7 +391,6 @@ var pwdc = {
             document, null, XPathResult.ANY_TYPE,null);
             multiple = (xpres.numberValue > 0);
         } catch (e) {
-            // Note: rewrite w/o XPath for Safari / MSIE compat
         }
         return multiple;
     },
@@ -433,11 +427,8 @@ var pwdc = {
             pwdc.lastPwdField = null;
         }
         // temporarily mask original key up/down handlers
-        // doesn't work for MSIE (blocks every keypress)
-        if (!pwdc.isMsie) {
-            pwdc.addEventListener(document, 'keydown',  pwdc.cancelEvent, false);
-            pwdc.addEventListener(document, 'keyup',  pwdc.cancelEvent, false);
-        }
+        pwdc.addEventListener(document, 'keydown',  pwdc.cancelEvent, false);
+        pwdc.addEventListener(document, 'keyup',  pwdc.cancelEvent, false);
         if (document.getElementById('mpwd_panel')) {
             pwdc.removePanel();
             return;
@@ -470,22 +461,19 @@ var pwdc = {
         div.setAttribute('id', 'mpwd_panel');
         div.appendChild(document.createTextNode('Master password: '));
 
-        // MSIE does not support changing type of input element, skip...
-        if (!pwdc.isMsie) {
-            var show = document.createElement('img');
-            show.setAttribute('src', (pwdc.prefs.clearText) ?
-                pwdc.icons.icnShow : pwdc.icons.icnHide);
-            show.style.width = "12px";
-            show.style.height = "12px";
-            show.setAttribute('id', "icnShow");
-            show.setAttribute('title', 'Show or hide generated password Shift+Ctrl+C');
-            show.style.paddingRight = '4px';
-            show.style.display = 'inline'; // some stupid sites set this to block
-            show.style.cursor = 'pointer';
-            show.style.border = 'none';
-            pwdc.addEventListener(show, 'click', pwdc.toggleClearText, true);
-            div.appendChild(show);
-        }
+        var show = document.createElement('img');
+        show.setAttribute('src', (pwdc.prefs.clearText) ?
+            pwdc.icons.icnShow : pwdc.icons.icnHide);
+        show.style.width = "12px";
+        show.style.height = "12px";
+        show.setAttribute('id', "icnShow");
+        show.setAttribute('title', 'Show or hide generated password Shift+Ctrl+C');
+        show.style.paddingRight = '4px';
+        show.style.display = 'inline'; // some stupid sites set this to block
+        show.style.cursor = 'pointer';
+        show.style.border = 'none';
+        pwdc.addEventListener(show, 'click', pwdc.toggleClearText, true);
+        div.appendChild(show);
 
         var pwd = document.createElement('input');
         pwd.style.border='1px solid #777';
@@ -531,10 +519,6 @@ var pwdc = {
         subicn.setAttribute('title', 'Using full host name');
         subicn.style.display='inline';
         subicn.style.cursor = 'pointer';
-        if (pwdc.isMsie) {
-            subicn.style.cursor = "hand";
-            subicn.style.backgroundColor = '#dfd';
-        }
         subicn.style.border = 'none';
         pwdc.addEventListener(subicn,'click', function(event) {
             pwdc.toggleSubdomain();
@@ -579,9 +563,7 @@ var pwdc = {
         }
 
         pwdc.addEventListener(div, "keyup", pwdc.keyup, false);
-        if (!pwdc.isMsie) {
-            pwdc.addEventListener(div, "keydown", pwdc.cancelEvent, false);
-        }
+        pwdc.addEventListener(div, "keydown", pwdc.cancelEvent, false);
 
         var bgd = document.createElement('div');
         bgd.setAttribute('id','mpwd_bgd');
@@ -590,7 +572,6 @@ var pwdc = {
         bgd.style.left='0px';
         bgd.style.backgroundColor='black';
         bgd.style.opacity='0.4';
-        if (pwdc.isMsie) bgd.style.filter = "alpha(opacity=40)";
         bgd.style.height = pag_h + 'px';
         bgd.style.width = pag_w + 'px';
         bgd.style.zIndex='9998';
@@ -772,20 +753,5 @@ pwdc.addEventListener(document, "DOMAttrModified",
     function(evt) {
         pwdc.initFldsSoon();
     }, true);
-
-// add menu command to manually launch passwd composer
-if (typeof(GM_registerMenuCommand) == 'function') {
-    try {
-        GM_registerMenuCommand("Password Composer", pwdc.addPanel, "p", "shift control", "p");
-    } catch (e) {
-        // There is a bug with GM 0.5.1 and 0.5.2 (beta) which kills the 5 args version.
-        GM_registerMenuCommand("Password Composer Shift+Ctrl+P", pwdc.addPanel);
-        // listen for SHIFT-CTRL-P keypress
-        window.addEventListener("keyup", function(e) { if (e.keyCode == 80 && e.ctrlKey && e.shiftKey) pwdc.addPanel(); }, true);
-    }
-} else {
-    // listen for SHIFT-CTRL-P keypress
-    pwdc.addEventListener(window, "keyup", function(e) { if (e.keyCode == 80 && e.ctrlKey && e.shiftKey) pwdc.addPanel(); }, true);
-}
 
 // end user script
