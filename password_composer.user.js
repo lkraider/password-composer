@@ -14,6 +14,7 @@
 // @grant         GM_getResourceURL
 // @grant         GM_getValue
 // @grant         GM_setValue
+// @run-at        document-idle
 // @version       3.0
 // @downloadURL   https://raw.githubusercontent.com/lkraider/password-composer/master/password_composer.user.js
 // ==/UserScript==
