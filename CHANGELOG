@@ -4,6 +4,10 @@ CHANGELOG
 Version 3.0
   - Drop MSIE support
 
+Version 2.04
+  - Handle UPPERCASE password fields (patch by Ed Blackman, thanks!)
+  - Float panel higher in the z-index order to avoid it being blocked
+
 Version 2.03
   - btter hostname regexp (thanks to Christoph Roeder)
 
