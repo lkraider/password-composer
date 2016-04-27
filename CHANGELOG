@@ -3,6 +3,9 @@ CHANGELOG
 
 Version 3.0
   - Drop MSIE support
+  - Require Greasemonkey 3.6+ and Javascript 1.7+
+  - Refactor resources and code
+  - Performance improvements
 
 Version 2.04
   - Handle UPPERCASE password fields (patch by Ed Blackman, thanks!)
