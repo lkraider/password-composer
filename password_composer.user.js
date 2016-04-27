@@ -311,7 +311,7 @@ var pwdc = {
         // keep panel at least 10 px away from right page edge
         div.style.left = ((250 + pwdLeft > pag_w) ? pag_w - 250 : pwdLeft) + 'px';
         div.style.top = pwdTop + 'px';
-        div.style.zIndex = '999999';  // make sure we're visible/on top
+        div.style.zIndex = '2147483647';  // make sure we're visible/on top
         div.setAttribute('id', 'mpwd_panel');
         div.appendChild(document.createTextNode('Master password: '));
 
@@ -428,7 +428,7 @@ var pwdc = {
         bgd.style.opacity='0.4';
         bgd.style.height = pag_h + 'px';
         bgd.style.width = pag_w + 'px';
-        bgd.style.zIndex = '999998';
+        bgd.style.zIndex = '2147483646';
         pwdc.addEventListener(bgd, 'click', pwdc.removePanel, true);
 
         var body = document.getElementsByTagName('body')[0];
