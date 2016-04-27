@@ -426,8 +426,8 @@ var pwdc = {
             div.appendChild(document.createElement('br'));
         }
 
-        pwdc.addEventListener(div, "keyup", pwdc.keyup, false);
-        pwdc.addEventListener(div, "keydown", pwdc.cancelEvent, false);
+        pwdc.addEventListener(div, 'keyup', pwdc.keyup, false);
+        pwdc.addEventListener(div, 'keydown', pwdc.cancelEvent, false);
 
         var bgd = document.createElement('div');
         bgd.setAttribute('id','mpwd_bgd');
@@ -593,23 +593,27 @@ function binl2hex(binarray) {
 // end MD5 stuff
 
 
-
 // INITIALIZE
 // change password field style: background image, color
 // add double click listener to open panel on current field
+
 pwdc.initFlds(document);
 
-// Ajax: new node listener
-pwdc.addEventListener(document, "DOMNodeInserted",
-    function(evt) {
-        evt = (evt) ? evt : window.event;
-        var elem = (evt.target) ? evt.target : evt.srcElement;
-        if (1 == elem.nodeType) pwdc.initFlds(elem);
-    }, true);
-// Ajax: attribute change listener
-pwdc.addEventListener(document, "DOMAttrModified",
-    function(evt) {
-        pwdc.initFldsSoon();
-    }, true);
+var observer = new MutationObserver(function(records) {
+    records.forEach(function(record) {
+        switch (record.type) {
+            case 'childList':
+                if (record.target.nodeType === 1) {
+                    pwdc.initFlds(record.target);
+                }
+                break;
+            case 'attributes':
+                pwdc.initFldsSoon();
+                break;
+        }
+    });
+});
+observer.observe(document, {childList: true, attributes: true, subtree: true,
+    attributeFilter: ['type']});
 
 // end user script
