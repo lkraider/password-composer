@@ -1,10 +1,16 @@
 // ==UserScript==
 // @name          Password Composer
 // @namespace     http://joe.lapoutre.com/BoT/Javascript/
-// @description   Generates site specific password, based on a single Master Password.
+// @description   Generate site specific password based on a single Master Password.
 // @include       *
 // @exclude
+// @resource      pwdfieldbg img/pwdfieldbg.png
+// @resource      icnShow img/icnShow.png
+// @resource      icnHide img/icnHide.png
+// @resource      icnPlus img/icnPlus.png
+// @resource      icnMin img/icnMin.png
 // @version       3.0
+// @downloadURL   https://raw.githubusercontent.com/lkraider/password-composer/master/password_composer.user.js
 // ==/UserScript==
 
 // begin user script
@@ -442,15 +448,15 @@ var pwdc = {
 
     icons: {
         // background icon for passwd field 12x14px
-        pwdfieldbg:  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAOCAYAAAAbvf3sAAABsUlEQVQoz22QQUgUcRTGf+//n7Hd1ZnM3UwlSRckI8KV8uYl3eoS7KlDFAjSTRepS5cKOtU96BpEeIw6rUJtiEQdKupSbOUhiDRYJtLZWV1nZzzsLC6LH7zT+37ve+/JHZ+7hNxUBkdmeEWaaZrycPjJEgUW8CgDoIJdJhA6Ad7ziGw2i4ggInRKkvPJPCvXRvAaflQYMCiCCVDiJfl8HoB4Eqbud5DJZCgsvmP5VgMwAh9Ni3K5HACJFMzeu0TOXcSyLP5+jhJqLk5Qp06bUpzkavCC52+eANAzEiW4G3yPdXNOmxitQKlUQutGeO8ZmH4YAb9WWLWPc9mIkUirKWkCvUNdXClUMK0QawAk6qgPj/lY/sYXf4ftSW5TLBYBCL04f97GsPr3zQC66lBTBqY9yPCP1LOeB/NP9b818Coea699JubAiO0DEtWp8RtcH5vhYt84o2achCiEA9R8aXXjE5tVBwl8dkTji0aUgRaFDusENRd36zfrrVO6gdOHbMbSFxjtP8sxawDbTGDWdwmqDpXyV5z22C7gBDAE9AE20LxgG9g8aE8VGY8Ch9uA/3vJy33OfZE10QAAAABJRU5ErkJggg%3D%3D",
+        pwdfieldbg: GM_getResourceURL("pwdfieldbg"),
         // show in cleartext
-        icnShow: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAkUlEQVR4nGL4TwRgwCWxc%2BfOU6dOQRUZowKI6N%2B%2Ff93c3Ly8vBCKMI3Ztm1bZ2dnenr65cuXcSoKCwt7%2BPDh4cOHs7KysCt6%2Ffo1Pz%2B%2Fs7Ozk5MTkPH582csiiZMmDBlyhQIu6amZubMmVgUGRkZvXr1CsK%2Bffu2oaEhdjdBAFyKaEV4AFQRLmOQAQAAAP%2F%2FAwB27VC%2BrCyA0QAAAABJRU5ErkJggg%3D%3D",
+        icnShow: GM_getResourceURL("icnShow"),
         // hide passwd (show as *****)
-        icnHide: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMAgMAAAArG7R0AAAADFBMVEX%2F%2F%2F%2FMzMxmZmYzMzM7z8wMAAAAJ0lEQVQImWNgAIMEhv%2FH0hgOMEYwHGAD0kD%2BAaAoBBuA8f%2F%2FH0AKARI5DD%2FY1kZdAAAAAElFTkSuQmCC",
+        icnHide: GM_getResourceURL("icnHide"),
         // plus sign (use full host name)
-        icnPlus: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAAAAADF%2BlnMAAAAHUlEQVR42mNogQGGlv8QAGExYLAYQACnLFwvDAAA6Fk4WdfT%2FgAAAAAASUVORK5CYII%3D",
+        icnPlus: GM_getResourceURL("icnPlus"),
         // minus sign (use top level domain name)
-        icnMin: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAAAAADF%2BlnMAAAAGUlEQVR42mNogQGGlv8QgIvFAAL%2FCaqDAQCbtDxVGHcjrgAAAABJRU5ErkJggg%3D%3D"
+        icnMin: GM_getResourceURL("icnMin")
     },
     // http://www.surbl.org/two-level-tlds
     // retrieved: 2006-08-21
