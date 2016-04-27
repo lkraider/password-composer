@@ -1,6 +1,14 @@
 CREDITS
 =======
 
+Original greasemonkey script version development by Johannes la Poutré
+  Release up to version 2.04:
+  http://www.xs4all.nl/~jlpoutre/BoT/Javascript/PasswordComposer/greasemonkey.html
+  http://userscripts.org/scripts/show/1341
+  Mirrors:
+  https://web.archive.org/web/20091026235957/http://www.xs4all.nl/~jlpoutre/BoT/Javascript/PasswordComposer/greasemonkey.html
+  http://userscripts-mirror.org/scripts/show/1341
+
 Inspired by Nick Wolff's bookmarklet "Generate Password"
   http://angel.net/~nic/passwdlet.html
 
