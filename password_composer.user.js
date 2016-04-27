@@ -50,7 +50,7 @@ var pwdc = {
         try {
             L = doc.getElementsByTagName('input');
         } catch (e) {
-            dbg( doc + ", " + e.message);
+            console.log(doc + ", " + e.message);
         }
         var flds = [];
         for (var i=0; i < L.length; i++) {
