@@ -18,6 +18,7 @@
 // @run-at        document-idle
 // @version       3.0
 // @downloadURL   https://raw.githubusercontent.com/lkraider/password-composer/master/password_composer.user.js
+// @license       MIT
 // ==/UserScript==
 
 var pwdc = {
