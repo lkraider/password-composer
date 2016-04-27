@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Password Composer
 // @namespace     http://joe.lapoutre.com/BoT/Javascript/
-// @description   Generate site specific password based on a single Master Password.
+// @description   Generate site specific password, based on a single Master Password.
 // @include       *
 // @exclude
 // @require       md5.js
@@ -482,7 +482,6 @@ var observer = new MutationObserver(function(records) {
         }
     });
 });
+
 observer.observe(document, {childList: true, attributes: true, subtree: true,
     attributeFilter: ['type']});
-
-// end user script
