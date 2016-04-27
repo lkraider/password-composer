@@ -1,7 +1,3 @@
-/* vim: ts=4 noet ai :
-  $Id: pwdcomposer.user.js 79 2006-09-08 07:44:01Z joe $
-*/
-
 // ==UserScript==
 // @name          Password Composer
 // @namespace     http://joe.lapoutre.com/BoT/Javascript/
