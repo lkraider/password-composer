@@ -234,32 +234,34 @@ var pwdc = {
         }
         var master = document.getElementById('masterpwd').value;
         var domain = document.getElementById('mpwddomain').value.toLowerCase();
-        var pass = pwdc.modes.get(pwdc.prefs.hashMode)(master, domain);
-        // show password in pwdcomposer rather than inserting into host page
-        var generatedpwd = document.getElementById('generatedpwd');
-        if (generatedpwd) {
-            generatedpwd.value = pass;
-            return;
-        }
-        // remove panel before messing with passwd fields in host page
-        pwdc.removePanel();
-        if (master !== '' && master !== null) {
-            var i=0, j=0;
-            var inputs = document.getElementsByTagName('input');
-            for(i=0; i<inputs.length; i++) {
-                var inp = inputs[i];
-                var cl = inp.getAttribute("class") || "";
-                // every passwd field is set to class "mpwdpasswd" on initialization
-                if (cl.indexOf("mpwdpasswd") != -1) {
-                    inp.value = pass;
-                    try {
-                        inp.type = (pwdc.prefs.clearText) ? "text" : "password";
-                    } catch (e) {}
-                }
+        const passGen = pwdc.modes.get(pwdc.prefs.hashMode);
+        passGen(master, domain).then(function(pass) {
+            // show password in pwdcomposer rather than inserting into host page
+            var generatedpwd = document.getElementById('generatedpwd');
+            if (generatedpwd) {
+                generatedpwd.value = pass;
+                return;
             }
-            // give focus to selected passwd field
-            if (pwdc.lastPwdField) pwdc.lastPwdField.focus();
-        }
+            // remove panel before messing with passwd fields in host page
+            pwdc.removePanel();
+            if (master !== '' && master !== null) {
+                var i=0, j=0;
+                var inputs = document.getElementsByTagName('input');
+                for(i=0; i<inputs.length; i++) {
+                    var inp = inputs[i];
+                    var cl = inp.getAttribute("class") || "";
+                    // every passwd field is set to class "mpwdpasswd" on initialization
+                    if (cl.indexOf("mpwdpasswd") != -1) {
+                        inp.value = pass;
+                        try {
+                            inp.type = (pwdc.prefs.clearText) ? "text" : "password";
+                        } catch (e) {}
+                    }
+                }
+                // give focus to selected passwd field
+                if (pwdc.lastPwdField) pwdc.lastPwdField.focus();
+            }
+        });
     },
 
     // check for multiple passwd fields per form (e.g. 'verify passwd')
@@ -488,13 +490,17 @@ var pwdc = {
     // text after last `_` in name is displayed in UI
     modes: new Map([
         ['MD5_8', function(master, domain) {
-            return hex_md5(master+':'+domain).substr(0,8);
+            return Promise.resolve(hex_md5(master+':'+domain).substr(0,8));
         }],
         ['SHA1_10', function(master, domain) {
-            return b64_sha1(master+':'+ domain).substr(0,8) + '1A';
+            return b64_sha1(master+':'+ domain).then(function(b64s) {
+                return b64s.substr(0,8) + '1A';
+            });
         }],
         ['SHA1_16', function(master, domain) {
-            return b64_sha1(master+':'+ domain).substr(0,13) + '@1A';
+            return b64_sha1(master+':'+ domain).then(function(b64s) {
+                return b64s.substr(0,13) + '@1A';
+            });
         }]
     ]),
 
@@ -511,6 +517,13 @@ var pwdc = {
         icnMin: GM_getResourceURL("icnMin")
     },
 };
+
+function b64_sha1(s) {
+    const buffer = new TextEncoder('utf-8').encode(s);
+    return crypto.subtle.digest('SHA-1', buffer).then(function (hash) {
+        return btoa(hash);
+    });
+}
 
 // INITIALIZE
 // change password field style: background image, color
