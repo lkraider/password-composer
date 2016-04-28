@@ -24,7 +24,8 @@
 var pwdc = {
     prefs: {
         clearText: false,  // show generated passwds in cleartext
-        topDomain: false   // use top domain instead of full host
+        topDomain: false,  // use top domain instead of full host
+        hashMode: 'SHA1_16' // hash and password length selection
     },
 
     // VARS
@@ -154,6 +155,22 @@ var pwdc = {
             pwdc.getHostname());
     },
 
+    toggleHashMode: function(val) {
+        const modes = Array.from(pwdc.modes.keys());
+        let i;
+        if (typeof(val) === 'number') {
+            i = val;
+        } else if (typeof(val) === 'string') {
+            i = modes.indexOf(val);
+        } else {
+            const j = modes.indexOf(pwdc.prefs.hashMode);
+            i = (j + 1) % modes.length;
+        }
+        pwdc.prefs.hashMode = modes[i];
+        const mode = document.getElementById('pwdc-mode');
+        mode.innerText = pwdc.prefs.hashMode.split('_').slice(-1);
+    },
+
     toggleClearText: function(val) {
         if (typeof(val) == 'boolean') {
             // use provided argument {true, false}...
@@ -217,7 +234,7 @@ var pwdc = {
         }
         var master = document.getElementById('masterpwd').value;
         var domain = document.getElementById('mpwddomain').value.toLowerCase();
-        var pass = hex_md5(master+':'+domain).substr(0,8);
+        var pass = pwdc.modes.get(pwdc.prefs.hashMode)(master, domain);
         // show password in pwdcomposer rather than inserting into host page
         var generatedpwd = document.getElementById('generatedpwd');
         if (generatedpwd) {
@@ -317,7 +334,7 @@ var pwdc = {
         div.style.fontFamily='sans-serif';
         div.style.lineHeight='1.8em';
         div.style.position='absolute';
-        div.style.width='230px';
+        div.style.width='235px';
         // keep panel at least 10 px away from right page edge
         div.style.left = ((250 + pwdLeft > pag_w) ? pag_w - 250 : pwdLeft) + 'px';
         div.style.top = pwdTop + 'px';
@@ -352,6 +369,23 @@ var pwdc = {
         pwd.style.backgroundColor='white';
         if (! pwdFound) pwdc.addEventListener(pwd, 'change', pwdc.generatePassword, true);
         div.appendChild(pwd);
+        {   // Toggle for generated password hashing mode
+            const mode = document.createElement('span');
+            mode.setAttribute('id','pwdc-mode');
+            mode.innerText = pwdc.prefs.hashMode.split('_').slice(-1);
+            mode.style.color = '#000';
+            mode.style.width = '12px';
+            mode.style.height = '12px';
+            mode.style.fontSize = '8px';
+            mode.style.fontFamily = 'monospace';
+            mode.style.marginLeft = '4px';
+            mode.style.display = 'inline';
+            mode.style.lineHeight = '15px';
+            mode.style.verticalAlign = 'top';
+            mode.style.cursor = 'pointer';
+            pwdc.addEventListener(mode, 'click', pwdc.toggleHashMode, true);
+            div.appendChild(mode);
+        }
         div.appendChild(document.createElement('br'));
 
         if (pwdc.hasMultiplePwdFields() || ! pwdFound) {
@@ -448,6 +482,21 @@ var pwdc = {
         setTimeout(function() { pwd.focus(); }, 250);
         pwdc.initSubdomainSetting();
     },
+
+    // hash operation modes -> map of names and functions
+    // name is stored in preferences
+    // text after last `_` in name is displayed in UI
+    modes: new Map([
+        ['MD5_8', function(master, domain) {
+            return hex_md5(master+':'+domain).substr(0,8);
+        }],
+        ['SHA1_10', function(master, domain) {
+            return b64_sha1(master+':'+ domain).substr(0,8) + '1A';
+        }],
+        ['SHA1_16', function(master, domain) {
+            return b64_sha1(master+':'+ domain).substr(0,13) + '@1A';
+        }]
+    ]),
 
     icons: {
         // background icon for passwd field 12x14px
