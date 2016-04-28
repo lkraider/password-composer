@@ -122,21 +122,21 @@ const pwdc = {
 
     // Setting: use sub domain
     initSubdomainSetting: function() {
-        if (typeof(GM_getValue) == 'function') {
+        if (typeof(GM_getValue) === 'function') {
             pwdc.prefs.topDomain = GM_getValue('topDomain', false);
         }
         pwdc.updateSubDomainSetting();
     },
 
     toggleSubdomain: function(val) {
-        if (typeof(val) == 'boolean') {
+        if (typeof(val) === 'boolean') {
             // use provided argument {true, false}...
             pwdc.prefs.topDomain = val;
         } else {
             // ...or toggle current value.
             pwdc.prefs.topDomain = !pwdc.prefs.topDomain;
         }
-        if (typeof(GM_setValue) == 'function') {
+        if (typeof(GM_setValue) === 'function') {
             GM_setValue('topDomain', pwdc.prefs.topDomain);
         }
         pwdc.updateSubDomainSetting();
@@ -173,7 +173,7 @@ const pwdc = {
     },
 
     toggleClearText: function(val) {
-        if (typeof(val) == 'boolean') {
+        if (typeof(val) === 'boolean') {
             // use provided argument {true, false}...
             pwdc.prefs.clearText = val;
         } else {
@@ -205,22 +205,22 @@ const pwdc = {
     keyup: function(e) {
         pwdc.checkPassword();
         // CR, LF
-        if (e.keyCode == 13 || e.keyCode == 10) {
+        if (e.keyCode === 13 || e.keyCode === 10) {
             pwdc.generatePassword();
         // ESC
-        } else if (e.keyCode == 27) {
+        } else if (e.keyCode === 27) {
             pwdc.removePanel();
         // SHIFT-CTRL-LEFT-ARROW
-        } else if (e.keyCode == 37 && e.ctrlKey && e.shiftKey) {
+        } else if (e.keyCode === 37 && e.ctrlKey && e.shiftKey) {
             pwdc.toggleSubdomain(true);
         // SHIFT-CTRL-RIGHT-ARROW
-        } else if (e.keyCode == 39 && e.ctrlKey && e.shiftKey) {
+        } else if (e.keyCode === 39 && e.ctrlKey && e.shiftKey) {
             pwdc.toggleSubdomain(false);
         // SHIFT-CTRL-C
-        } else if (e.keyCode == 67 && e.ctrlKey && e.shiftKey) {
+        } else if (e.keyCode === 67 && e.ctrlKey && e.shiftKey) {
             pwdc.toggleClearText();
         // SHIFT-CTRL-M
-        } else if (e.keyCode == 77 && e.ctrlKey && e.shiftKey) {
+        } else if (e.keyCode === 77 && e.ctrlKey && e.shiftKey) {
             pwdc.toggleHashMode();
         }
         return true;
@@ -304,7 +304,7 @@ const pwdc = {
             const elem = (evt.target) ? evt.target : evt.srcElement;
             let pwdTop = 0;
             let pwdLeft = 0;
-            if (1 == elem.nodeType) {
+            if (1 === elem.nodeType) {
                 let fld = pwdc.lastPwdField = elem;
                 // open pwd panel aligned with double-clicked field
                 while (fld.offsetParent) {
