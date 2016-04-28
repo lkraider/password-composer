@@ -5,6 +5,7 @@
 // @include       *
 // @exclude
 // @require       md5.js
+// @require       sha1.js
 // @resource      pwdfieldbg    img/pwdfieldbg.png
 // @resource      icnShow       img/icnShow.png
 // @resource      icnHide       img/icnHide.png
