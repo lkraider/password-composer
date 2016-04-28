@@ -377,11 +377,12 @@ var pwdc = {
             mode.style.color = '#000';
             mode.style.width = '12px';
             mode.style.height = '12px';
-            mode.style.fontSize = '8px';
+            mode.style.fontSize = '10px';
             mode.style.fontFamily = 'monospace';
             mode.style.marginLeft = '4px';
-            mode.style.display = 'inline';
+            mode.style.display = 'inline-block';
             mode.style.lineHeight = '15px';
+            mode.style.textAlign = 'right';
             mode.style.verticalAlign = 'top';
             mode.style.cursor = 'pointer';
             pwdc.addEventListener(mode, 'click', pwdc.toggleHashMode, true);
