@@ -22,7 +22,7 @@
 // @license       MIT
 // ==/UserScript==
 
-var pwdc = {
+const pwdc = {
     prefs: {
         clearText: false,  // show generated passwds in cleartext
         topDomain: false,  // use top domain instead of full host
@@ -287,14 +287,22 @@ var pwdc = {
     },
 
     addPanel: function(evt) {
-        evt = (evt) ? evt : window.event;
-        var pwdTop = 0;
-        var pwdLeft = 0;
-        if (evt) {
-            var elem = (evt.target) ? evt.target : evt.srcElement;
-            // element nodes only
+        if (document.getElementById('mpwd_panel')) {
+            pwdc.removePanel();
+            return;
+        }
+        const [pwdTop, pwdLeft] = (function(evt) {
+            // Calculate top-left panel position based on field
+            evt = (evt) ? evt : window.event;
+            if (! evt) {
+                pwdc.lastPwdField = null;
+                return [0, 0];
+            }
+            const elem = (evt.target) ? evt.target : evt.srcElement;
+            let pwdTop = 0;
+            let pwdLeft = 0;
             if (1 == elem.nodeType) {
-                var fld = pwdc.lastPwdField = elem;
+                let fld = pwdc.lastPwdField = elem;
                 // open pwd panel aligned with double-clicked field
                 while (fld.offsetParent) {
                     pwdTop += fld.offsetTop;
@@ -305,71 +313,71 @@ var pwdc = {
                 pwdTop -= 5;
                 pwdLeft -= 5;
             }
-        } else {
-            pwdc.lastPwdField = null;
-        }
+            return [pwdTop, pwdLeft];
+        })(evt);
+        const pwdFound = (pwdc.lastPwdField !== null);
+        // full document width and height as rendered in browser:
+        const pag_w = document.documentElement.scrollWidth;
+        const pag_h = (window.innerHeight > document.documentElement.scrollHeight) ?
+            window.innerHeight : document.documentElement.scrollHeight;
         // temporarily mask original key up/down handlers
         pwdc.addEventListener(document, 'keydown',  pwdc.cancelEvent, false);
         pwdc.addEventListener(document, 'keyup',  pwdc.cancelEvent, false);
-        if (document.getElementById('mpwd_panel')) {
-            pwdc.removePanel();
-            return;
+        // create and style panel elements
+        const div = document.createElement('div');
+        const pwd = document.createElement('input');
+        {   // Main panel
+            div.style.color = '#777';
+            div.style.padding = '5px';
+            div.style.backgroundColor = 'white';
+            div.style.border = '1px solid black';
+            div.style.borderBottom = '3px solid black';
+            div.style.borderRight = '2px solid black';
+            div.style.MozBorderRadius = '10px';
+            div.style.fontSize = '9pt';
+            div.style.fontFamily = 'sans-serif';
+            div.style.lineHeight = '1.8em';
+            div.style.position = 'absolute';
+            div.style.width = '235px';
+            // keep panel at least 10 px away from right page edge
+            div.style.left = ((250 + pwdLeft > pag_w) ? pag_w - 250 : pwdLeft) + 'px';
+            div.style.top = pwdTop + 'px';
+            div.style.zIndex = '2147483647';  // make sure we're visible/on top
+            div.setAttribute('id', 'mpwd_panel');
         }
-        var pwdFound = (pwdc.lastPwdField !== null);
-
-        // full document width and height as rendered in browser:
-        // reverting to non-standard properties below
-        var pag_w = document.documentElement.scrollWidth;
-        var pag_h = document.documentElement.scrollHeight;
-        if (window.innerHeight > pag_h) pag_h = window.innerHeight;
-
-        var div = document.createElement('div');
-        div.style.color='#777';
-        div.style.padding='5px';
-        div.style.backgroundColor='white';
-        div.style.border='1px solid black';
-        div.style.borderBottom='3px solid black';
-        div.style.borderRight='2px solid black';
-        div.style.MozBorderRadius='10px';
-        div.style.fontSize='9pt';
-        div.style.fontFamily='sans-serif';
-        div.style.lineHeight='1.8em';
-        div.style.position='absolute';
-        div.style.width='235px';
-        // keep panel at least 10 px away from right page edge
-        div.style.left = ((250 + pwdLeft > pag_w) ? pag_w - 250 : pwdLeft) + 'px';
-        div.style.top = pwdTop + 'px';
-        div.style.zIndex = '2147483647';  // make sure we're visible/on top
-        div.setAttribute('id', 'mpwd_panel');
         div.appendChild(document.createTextNode('Master password: '));
-
-        var show = document.createElement('img');
-        show.setAttribute('src', (pwdc.prefs.clearText) ?
-            pwdc.icons.icnShow : pwdc.icons.icnHide);
-        show.style.width = "12px";
-        show.style.height = "12px";
-        show.setAttribute('id', "icnShow");
-        show.setAttribute('title', 'Show or hide generated password Shift+Ctrl+C');
-        show.style.paddingRight = '4px';
-        show.style.display = 'inline'; // some stupid sites set this to block
-        show.style.cursor = 'pointer';
-        show.style.border = 'none';
-        pwdc.addEventListener(show, 'click', pwdc.toggleClearText, true);
-        div.appendChild(show);
-
-        var pwd = document.createElement('input');
-        pwd.style.border='1px solid #777';
-        pwd.setAttribute('type','password');
-        pwd.setAttribute('id','masterpwd');
-        pwd.setAttribute("class", "mpwdpasswd");
-        // specify tabindex, otherwise an existing 'tabindex=2' on host page takes precedence
-        pwd.setAttribute('tabindex',10000);
-        pwd.style.width = '100px';
-        pwd.style.fontSize='9pt';
-        pwd.style.color='#777';
-        pwd.style.backgroundColor='white';
-        if (! pwdFound) pwdc.addEventListener(pwd, 'change', pwdc.generatePassword, true);
-        div.appendChild(pwd);
+        {   // Toggle for clear password display
+            const show = document.createElement('img');
+            show.setAttribute('src', (pwdc.prefs.clearText) ?
+                pwdc.icons.icnShow : pwdc.icons.icnHide);
+            show.style.width = '12px';
+            show.style.height = '12px';
+            show.setAttribute('id', 'icnShow');
+            show.setAttribute('title', 'Show or hide generated password Shift+Ctrl+C');
+            show.style.paddingRight = '4px';
+            show.style.display = 'inline'; // some sites set this to block
+            show.style.cursor = 'pointer';
+            show.style.border = 'none';
+            pwdc.addEventListener(show, 'click', pwdc.toggleClearText, true);
+            div.appendChild(show);
+        }
+        {   // Master password input
+            pwd.style.border = '1px solid #777';
+            pwd.setAttribute('type', 'password');
+            pwd.setAttribute('id', 'masterpwd');
+            pwd.setAttribute('class', 'mpwdpasswd');
+            // specify tabindex
+            // otherwise an existing 'tabindex=2' on host page takes precedence
+            pwd.setAttribute('tabindex', 10000);
+            pwd.style.width = '100px';
+            pwd.style.fontSize = '9pt';
+            pwd.style.color = '#777';
+            pwd.style.backgroundColor = 'white';
+            if (! pwdFound) {
+                pwdc.addEventListener(pwd, 'change', pwdc.generatePassword, true);
+            }
+            div.appendChild(pwd);
+        }
         {   // Toggle for generated password hashing mode
             const mode = document.createElement('span');
             mode.setAttribute('id','pwdc-mode');
@@ -389,64 +397,69 @@ var pwdc = {
             div.appendChild(mode);
         }
         div.appendChild(document.createElement('br'));
-
-        if (pwdc.hasMultiplePwdFields() || ! pwdFound) {
+        if (! pwdFound || pwdc.hasMultiplePwdFields()) {
+            // Verify password input
             // only if a 'verify field' is on original page
             div.appendChild(document.createTextNode('Check password: '));
-            var pwd2 = document.createElement('input');
-            pwd2.setAttribute('type','password');
-            pwd2.setAttribute('id','secondpwd');
-            pwd2.setAttribute("class", "mpwdpasswd");
-            pwd2.setAttribute('tabindex',10001);
+            const pwd2 = document.createElement('input');
+            pwd2.setAttribute('type', 'password');
+            pwd2.setAttribute('id', 'secondpwd');
+            pwd2.setAttribute('class', 'mpwdpasswd');
+            pwd2.setAttribute('tabindex', 10001);
             pwd2.style.width = '100px';
-            pwd2.style.color='#777';
-            pwd2.style.backgroundColor='white';
-            pwd2.style.border='1px solid #777';
-            pwd2.style.fontSize='9pt';
-            if (! pwdFound) pwdc.addEventListener(pwd2, 'change', pwdc.generatePassword, true);
+            pwd2.style.color = '#777';
+            pwd2.style.backgroundColor = 'white';
+            pwd2.style.border = '1px solid #777';
+            pwd2.style.fontSize = '9pt';
+            if (! pwdFound) {
+                pwdc.addEventListener(pwd2, 'change', pwdc.generatePassword, true);
+            }
             div.appendChild(pwd2);
             div.appendChild(document.createElement('br'));
         }
-
         div.appendChild(document.createTextNode('Domain: '));
-
-        var subicn = document.createElement('img');
-        subicn.setAttribute('src', pwdc.icons.icnPlus);
-        subicn.style.width = "9px";
-        subicn.style.height = "9px";
-        subicn.style.marginRight = "5px";
-        subicn.setAttribute('id', "icnSubdom");
-        subicn.setAttribute('title', 'Using full host name');
-        subicn.style.display='inline';
-        subicn.style.cursor = 'pointer';
-        subicn.style.border = 'none';
-        pwdc.addEventListener(subicn,'click', function(event) {
-            pwdc.toggleSubdomain();
-            document.getElementById('masterpwd').focus();
-        }, true);
-        div.appendChild(subicn);
-
-        var domn = document.createElement('input');
-        domn.setAttribute('type','text');
-        domn.setAttribute('value', pwdc.getHostname());
-        domn.setAttribute('id','mpwddomain');
-        domn.setAttribute('tabindex',10002);
-        domn.setAttribute('title','Edit domain name for different password');
-        domn.style.width = '150px';
-        domn.style.border = 'none';
-        domn.style.fontSize = '9pt';
-        domn.style.color = '#777';
-        domn.style.backgroundColor = 'white';
-        if (! pwdFound) pwdc.addEventListener(domn, 'change', pwdc.generatePassword, true);
-        div.appendChild(domn);
-
+        {   // Toggle for removing subdomain
+            const subicn = document.createElement('img');
+            subicn.setAttribute('src', pwdc.icons.icnPlus);
+            subicn.style.width = '9px';
+            subicn.style.height = '9px';
+            subicn.style.marginRight = '5px';
+            subicn.setAttribute('id', 'icnSubdom');
+            subicn.setAttribute('title', 'Using full host name');
+            subicn.style.display = 'inline';
+            subicn.style.cursor = 'pointer';
+            subicn.style.border = 'none';
+            pwdc.addEventListener(subicn, 'click', function(event) {
+                pwdc.toggleSubdomain();
+                document.getElementById('masterpwd').focus();
+            }, true);
+            div.appendChild(subicn);
+        }
+        {   // Domain name input
+            const domn = document.createElement('input');
+            domn.setAttribute('type', 'text');
+            domn.setAttribute('value', pwdc.getHostname());
+            domn.setAttribute('id', 'mpwddomain');
+            domn.setAttribute('tabindex', 10002);
+            domn.setAttribute('title', 'Edit domain name for different password');
+            domn.style.width = '150px';
+            domn.style.border = 'none';
+            domn.style.fontSize = '9pt';
+            domn.style.color = '#777';
+            domn.style.backgroundColor = 'white';
+            if (! pwdFound) {
+                pwdc.addEventListener(domn, 'change', pwdc.generatePassword, true);
+            }
+            div.appendChild(domn);
+        }
         if (! pwdFound) {
+            // Generated password field
             // show generated password if no password field found on host page
             div.appendChild(document.createTextNode('Generated pwd: '));
-            var pwd3 = document.createElement('input');
-            pwd3.setAttribute('type','text');
-            pwd3.setAttribute('id','generatedpwd');
-            pwd3.setAttribute('tabindex',10004);
+            const pwd3 = document.createElement('input');
+            pwd3.setAttribute('type', 'text');
+            pwd3.setAttribute('id', 'generatedpwd');
+            pwd3.setAttribute('tabindex', 10004);
             pwd3.style.width = '100px';
             pwd3.style.color = 'black';
             pwd3.style.backgroundColor = 'white';
@@ -465,19 +478,20 @@ var pwdc = {
         pwdc.addEventListener(div, 'keyup', pwdc.keyup, false);
         pwdc.addEventListener(div, 'keydown', pwdc.cancelEvent, false);
 
-        var bgd = document.createElement('div');
-        bgd.setAttribute('id','mpwd_bgd');
-        bgd.style.position='absolute';
-        bgd.style.top='0px';
-        bgd.style.left='0px';
-        bgd.style.backgroundColor='black';
-        bgd.style.opacity='0.4';
-        bgd.style.height = pag_h + 'px';
-        bgd.style.width = pag_w + 'px';
-        bgd.style.zIndex = '2147483646';
-        pwdc.addEventListener(bgd, 'click', pwdc.removePanel, true);
-
-        var body = document.getElementsByTagName('body')[0];
+        const bgd = document.createElement('div');
+        {   // Full page overlay
+            bgd.setAttribute('id', 'mpwd_bgd');
+            bgd.style.position = 'absolute';
+            bgd.style.top = '0px';
+            bgd.style.left = '0px';
+            bgd.style.backgroundColor = 'black';
+            bgd.style.opacity = '0.4';
+            bgd.style.height = pag_h + 'px';
+            bgd.style.width = pag_w + 'px';
+            bgd.style.zIndex = '2147483646';
+            pwdc.addEventListener(bgd, 'click', pwdc.removePanel, true);
+        }
+        const body = document.getElementsByTagName('body')[0];
         body.appendChild(bgd);
         body.appendChild(div);
         try { pwd.focus(); } catch(e) {}
@@ -520,7 +534,7 @@ var pwdc = {
 
 pwdc.initFlds(document);
 
-var observer = new MutationObserver(function(records) {
+const observer = new MutationObserver(function(records) {
     records.forEach(function(record) {
         switch (record.type) {
             case 'childList':
