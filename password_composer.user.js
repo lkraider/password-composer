@@ -521,7 +521,7 @@ var pwdc = {
 function b64_sha1(s) {
     const buffer = new TextEncoder('utf-8').encode(s);
     return crypto.subtle.digest('SHA-1', buffer).then(function (hash) {
-        return btoa(hash);
+        return btoa(String.fromCharCode(...new Uint8Array(hash)));
     });
 }
 
