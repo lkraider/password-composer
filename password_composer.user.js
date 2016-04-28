@@ -219,6 +219,9 @@ const pwdc = {
         // SHIFT-CTRL-C
         } else if (e.keyCode == 67 && e.ctrlKey && e.shiftKey) {
             pwdc.toggleClearText();
+        // SHIFT-CTRL-M
+        } else if (e.keyCode == 77 && e.ctrlKey && e.shiftKey) {
+            pwdc.toggleHashMode();
         }
         return true;
     },
@@ -380,7 +383,8 @@ const pwdc = {
         }
         {   // Toggle for generated password hashing mode
             const mode = document.createElement('span');
-            mode.setAttribute('id','pwdc-mode');
+            mode.setAttribute('id', 'pwdc-mode');
+            mode.setAttribute('title', 'Generated password hash mode and length Shift+Ctrl+M');
             mode.innerText = pwdc.prefs.hashMode.split('_').slice(-1);
             mode.style.color = '#000';
             mode.style.width = '12px';
