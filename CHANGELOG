@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+Version 3.1
+  - Add password length options
+  - Use SHA1 hash for the new password length options
+
 Version 3.0
   - Drop MSIE support
   - Require Greasemonkey 3.6+ and Javascript 1.7+
