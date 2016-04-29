@@ -35,17 +35,19 @@ const pwdc = {
 
     // METHODS
     addOpener: function(fld) {
-        var cls = fld.getAttribute("class");
+        var cls = fld.getAttribute('class');
         // return if class name (and dblclick handler) was set already
-        if (cls && cls.indexOf("mpwdpasswd") > -1) return;
-        fld.style.background = "#dfd url(" + this.icons.pwdfieldbg + ")";
-        fld.style.backgroundPosition = "top right";
-        fld.style.backgroundRepeat = "no-repeat";
-        fld.style.borderColor = "green";
-        fld.style.borderStyle = "inset";
+        if (cls && cls.indexOf('pwdc-password') > -1) {
+            return;
+        }
+        fld.style.background = '#dfd url(' + this.icons.pwdfieldbg + ')';
+        fld.style.backgroundPosition = 'top right';
+        fld.style.backgroundRepeat = 'no-repeat';
+        fld.style.borderColor = 'green';
+        fld.style.borderStyle = 'inset';
         pwdc.addEventListener(fld, 'dblclick', pwdc.addPanel, true);
-        fld.title = "Double click to open Password Composer";
-        fld.setAttribute("class", (cls) ? cls + " mpwdpasswd" : "mpwdpasswd");
+        fld.title = 'Double click to open Password Composer';
+        fld.setAttribute('class', (cls) ? cls + ' pwdc-password' : 'pwdc-password');
     },
 
     initFlds: function(doc) {
@@ -53,17 +55,17 @@ const pwdc = {
         try {
             L = doc.getElementsByTagName('input');
         } catch (e) {
-            console.log(doc + ", " + e.message);
+            console.log(doc + ', ' + e.message);
         }
         var flds = [];
         for (var i=0; i < L.length; i++) {
             var nm, tp, cl;
-            try { nm = L[i].getAttribute("name") || ""; } catch(e) { }
-            try { tp = L[i].getAttribute("type") || ""; } catch(e) { }
-            try { cl = L[i].getAttribute("class") || ""; } catch(e) { }
-            if ((tp.toLowerCase() == "password") ||
-                (tp == "text" && nm.toLowerCase().substring(0,5) == "passw") ||
-                (cl.indexOf("mpwdpasswd") > -1)) {
+            try { nm = L[i].getAttribute('name') || ''; } catch(e) { }
+            try { tp = L[i].getAttribute('type') || ''; } catch(e) { }
+            try { cl = L[i].getAttribute('class') || ''; } catch(e) { }
+            if ((tp.toLowerCase() === 'password') ||
+                (tp === 'text' && nm.toLowerCase().substring(0,5) === 'passw') ||
+                (cl.indexOf('pwdc-password') > -1)) {
                     pwdc.addOpener(L[i]);
             }
         }
@@ -80,14 +82,14 @@ const pwdc = {
         if (obj.addEventListener) {
             obj.addEventListener(evtName, func, capture);
             return true;
-        } else if (obj.attachEvent) return obj.attachEvent("on"+evtName, func);
+        } else if (obj.attachEvent) return obj.attachEvent('on'+evtName, func);
     },
 
     removeEventListener: function(obj, evtName, func, capture) {
         if (obj.removeEventListener) {
             obj.removeEventListener(evtName, func, capture);
             return true;
-        } else if (obj.detachEvent) return obj.detachEvent("on"+evtName, func);
+        } else if (obj.detachEvent) return obj.detachEvent('on'+evtName, func);
     },
 
     getHostname: function() {
@@ -98,7 +100,7 @@ const pwdc = {
             host = url.match(re)[1];
         } catch (e) {
             // e.g.  working on a local file makes no sense
-            return "INVALID DOMAIN";
+            return 'INVALID DOMAIN';
         }
         // look at minimum domain instead of host
         // see http://labs.zarate.org/passwd/
@@ -106,7 +108,7 @@ const pwdc = {
             host = host.split('.');
             if (host[2] !== null) {
                 s = host[host.length-2] + '.' + host[host.length-1];
-                const domains = new Set(GM_getResourceText("domains").split('\n'));
+                const domains = new Set(GM_getResourceText('domains').split('\n'));
                 if (domains.has(s)) {
                     s = host[host.length-3] + '.' + s;
                 }
@@ -140,11 +142,11 @@ const pwdc = {
             GM_setValue('topDomain', pwdc.prefs.topDomain);
         }
         pwdc.updateSubDomainSetting();
-        document.getElementById('masterpwd').focus();
+        document.getElementById('pwdc-master').focus();
     },
 
     updateSubDomainSetting: function() {
-        var icn = document.getElementById("icnSubdom");
+        var icn = document.getElementById('pwdc-subdomain');
         if (pwdc.prefs.topDomain) {
             icn.setAttribute('src', pwdc.icons.icnPlus);
             icn.setAttribute('title', "Using host's top level domain name");
@@ -152,7 +154,7 @@ const pwdc = {
             icn.setAttribute('src', pwdc.icons.icnMin);
             icn.setAttribute('title', "Using full host name");
         }
-        document.getElementById("mpwddomain").setAttribute('value',
+        document.getElementById('pwdc-domain').setAttribute('value',
             pwdc.getHostname());
     },
 
@@ -180,16 +182,16 @@ const pwdc = {
             // ...or toggle current value.
             pwdc.prefs.clearText = !pwdc.prefs.clearText;
         }
-        var icn = document.getElementById("icnShow");
+        var icn = document.getElementById('pwdc-show');
         icn.setAttribute('src', (pwdc.prefs.clearText) ?
             pwdc.icons.icnShow : pwdc.icons.icnHide);
-        document.getElementById('masterpwd').focus();
+        document.getElementById('pwdc-master').focus();
     },
 
     // verify if both passwords match (if two fields are displayed)
     checkPassword: function() {
-        var pwd = document.getElementById('masterpwd');
-        var pwd2 = document.getElementById('secondpwd');
+        var pwd = document.getElementById('pwdc-master');
+        var pwd2 = document.getElementById('pwdc-verify');
         if (!pwd2) return true;
         if (pwd.value !== pwd2.value && pwd2.value !== '') {
             pwd2.style.background='#f77';
@@ -236,11 +238,11 @@ const pwdc = {
         if (!pwdc.checkPassword()) {
             return;
         }
-        var master = document.getElementById('masterpwd').value;
-        var domain = document.getElementById('mpwddomain').value.toLowerCase();
+        var master = document.getElementById('pwdc-master').value;
+        var domain = document.getElementById('pwdc-domain').value.toLowerCase();
         var pass = pwdc.modes.get(pwdc.prefs.hashMode)(master, domain);
         // show password in pwdcomposer rather than inserting into host page
-        var generatedpwd = document.getElementById('generatedpwd');
+        var generatedpwd = document.getElementById('pwdc-generated');
         if (generatedpwd) {
             generatedpwd.value = pass;
             return;
@@ -252,12 +254,12 @@ const pwdc = {
             var inputs = document.getElementsByTagName('input');
             for(i=0; i<inputs.length; i++) {
                 var inp = inputs[i];
-                var cl = inp.getAttribute("class") || "";
-                // every passwd field is set to class "mpwdpasswd" on initialization
-                if (cl.indexOf("mpwdpasswd") != -1) {
+                var cl = inp.getAttribute('class') || '';
+                // every passwd field is set to class "pwdc-password" on initialization
+                if (cl.indexOf('pwdc-password') > -1) {
                     inp.value = pass;
                     try {
-                        inp.type = (pwdc.prefs.clearText) ? "text" : "password";
+                        inp.type = (pwdc.prefs.clearText) ? 'text' : 'password';
                     } catch (e) {}
                 }
             }
@@ -282,15 +284,15 @@ const pwdc = {
 
     removePanel: function() {
         var body = document.getElementsByTagName('body')[0];
-        body.removeChild(document.getElementById('mpwd_bgd'));
-        body.removeChild(document.getElementById('mpwd_panel'));
+        body.removeChild(document.getElementById('pwdc-overlay'));
+        body.removeChild(document.getElementById('pwdc-panel'));
         // remove masking key up/down event handlers
         pwdc.removeEventListener(document, 'keydown', pwdc.cancelEvent, false);
         pwdc.removeEventListener(document, 'keyup', pwdc.cancelEvent, false);
     },
 
     addPanel: function(evt) {
-        if (document.getElementById('mpwd_panel')) {
+        if (document.getElementById('pwdc-panel')) {
             pwdc.removePanel();
             return;
         }
@@ -330,6 +332,7 @@ const pwdc = {
         const div = document.createElement('div');
         const pwd = document.createElement('input');
         {   // Main panel
+            div.setAttribute('id', 'pwdc-panel');
             div.style.color = '#777';
             div.style.padding = '5px';
             div.style.backgroundColor = 'white';
@@ -346,17 +349,16 @@ const pwdc = {
             div.style.left = ((250 + pwdLeft > pag_w) ? pag_w - 250 : pwdLeft) + 'px';
             div.style.top = pwdTop + 'px';
             div.style.zIndex = '2147483647';  // make sure we're visible/on top
-            div.setAttribute('id', 'mpwd_panel');
         }
         div.appendChild(document.createTextNode('Master password: '));
         {   // Toggle for clear password display
             const show = document.createElement('img');
+            show.setAttribute('id', 'pwdc-show');
+            show.setAttribute('title', 'Show or hide generated password Shift+Ctrl+C');
             show.setAttribute('src', (pwdc.prefs.clearText) ?
                 pwdc.icons.icnShow : pwdc.icons.icnHide);
             show.style.width = '12px';
             show.style.height = '12px';
-            show.setAttribute('id', 'icnShow');
-            show.setAttribute('title', 'Show or hide generated password Shift+Ctrl+C');
             show.style.paddingRight = '4px';
             show.style.display = 'inline'; // some sites set this to block
             show.style.cursor = 'pointer';
@@ -365,13 +367,13 @@ const pwdc = {
             div.appendChild(show);
         }
         {   // Master password input
-            pwd.style.border = '1px solid #777';
+            pwd.setAttribute('id', 'pwdc-master');
             pwd.setAttribute('type', 'password');
-            pwd.setAttribute('id', 'masterpwd');
-            pwd.setAttribute('class', 'mpwdpasswd');
+            pwd.setAttribute('class', 'pwdc-password');
             // specify tabindex
             // otherwise an existing 'tabindex=2' on host page takes precedence
             pwd.setAttribute('tabindex', 10000);
+            pwd.style.border = '1px solid #777';
             pwd.style.width = '100px';
             pwd.style.fontSize = '9pt';
             pwd.style.color = '#777';
@@ -406,9 +408,9 @@ const pwdc = {
             // only if a 'verify field' is on original page
             div.appendChild(document.createTextNode('Check password: '));
             const pwd2 = document.createElement('input');
+            pwd2.setAttribute('id', 'pwdc-verify');
             pwd2.setAttribute('type', 'password');
-            pwd2.setAttribute('id', 'secondpwd');
-            pwd2.setAttribute('class', 'mpwdpasswd');
+            pwd2.setAttribute('class', 'pwdc-password');
             pwd2.setAttribute('tabindex', 10001);
             pwd2.style.width = '100px';
             pwd2.style.color = '#777';
@@ -424,28 +426,28 @@ const pwdc = {
         div.appendChild(document.createTextNode('Domain: '));
         {   // Toggle for removing subdomain
             const subicn = document.createElement('img');
+            subicn.setAttribute('id', 'pwdc-subdomain');
+            subicn.setAttribute('title', 'Using full host name');
             subicn.setAttribute('src', pwdc.icons.icnPlus);
             subicn.style.width = '9px';
             subicn.style.height = '9px';
             subicn.style.marginRight = '5px';
-            subicn.setAttribute('id', 'icnSubdom');
-            subicn.setAttribute('title', 'Using full host name');
             subicn.style.display = 'inline';
             subicn.style.cursor = 'pointer';
             subicn.style.border = 'none';
             pwdc.addEventListener(subicn, 'click', function(event) {
                 pwdc.toggleSubdomain();
-                document.getElementById('masterpwd').focus();
+                document.getElementById('pwdc-master').focus();
             }, true);
             div.appendChild(subicn);
         }
         {   // Domain name input
             const domn = document.createElement('input');
+            domn.setAttribute('id', 'pwdc-domain');
             domn.setAttribute('type', 'text');
-            domn.setAttribute('value', pwdc.getHostname());
-            domn.setAttribute('id', 'mpwddomain');
-            domn.setAttribute('tabindex', 10002);
             domn.setAttribute('title', 'Edit domain name for different password');
+            domn.setAttribute('tabindex', 10002);
+            domn.setAttribute('value', pwdc.getHostname());
             domn.style.width = '150px';
             domn.style.border = 'none';
             domn.style.fontSize = '9pt';
@@ -461,8 +463,8 @@ const pwdc = {
             // show generated password if no password field found on host page
             div.appendChild(document.createTextNode('Generated pwd: '));
             const pwd3 = document.createElement('input');
+            pwd3.setAttribute('id', 'pwdc-generated');
             pwd3.setAttribute('type', 'text');
-            pwd3.setAttribute('id', 'generatedpwd');
             pwd3.setAttribute('tabindex', 10004);
             pwd3.style.width = '100px';
             pwd3.style.color = 'black';
@@ -484,7 +486,7 @@ const pwdc = {
 
         const bgd = document.createElement('div');
         {   // Full page overlay
-            bgd.setAttribute('id', 'mpwd_bgd');
+            bgd.setAttribute('id', 'pwdc-overlay');
             bgd.style.position = 'absolute';
             bgd.style.top = '0px';
             bgd.style.left = '0px';
@@ -520,15 +522,15 @@ const pwdc = {
 
     icons: {
         // background icon for passwd field 12x14px
-        pwdfieldbg: GM_getResourceURL("pwdfieldbg"),
+        pwdfieldbg: GM_getResourceURL('pwdfieldbg'),
         // show in cleartext
-        icnShow: GM_getResourceURL("icnShow"),
+        icnShow: GM_getResourceURL('icnShow'),
         // hide passwd (show as *****)
-        icnHide: GM_getResourceURL("icnHide"),
+        icnHide: GM_getResourceURL('icnHide'),
         // plus sign (use full host name)
-        icnPlus: GM_getResourceURL("icnPlus"),
+        icnPlus: GM_getResourceURL('icnPlus'),
         // minus sign (use top level domain name)
-        icnMin: GM_getResourceURL("icnMin")
+        icnMin: GM_getResourceURL('icnMin')
     },
 };
 
