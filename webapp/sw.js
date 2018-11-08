@@ -1,9 +1,7 @@
 //This is the service worker with the Cache-first network
 
 var CACHE = 'pwabuilder-precache';
-var precacheFiles = [
-      /* Add an array of files to precache for your app */
-    ];
+var precacheManifest = 'pass.manifest';
 
 //Install stage sets up the cache-array to configure pre-cache content
 self.addEventListener('install', function(evt) {
@@ -30,7 +28,13 @@ self.addEventListener('fetch', function(evt) {
 
 function precache() {
   return caches.open(CACHE).then(function (cache) {
-    return cache.addAll(precacheFiles);
+    fetch(precacheManifest).then(function (response) {
+      return response.text();
+    }).then(function (text) {
+      var precacheFiles = text.split("\n").slice(2);
+      console.log('[PWA Builder] Precache files:' + precacheFiles);
+      return cache.addAll(precacheFiles);
+    })
   });
 }
 
@@ -44,7 +48,7 @@ function fromCache(request) {
 }
 
 function update(request) {
-  //this is where we call the server to get the newest version of the 
+  //this is where we call the server to get the newest version of the
   //file to use the next time we show view
   return caches.open(CACHE).then(function (cache) {
     return fetch(request).then(function (response) {
