@@ -1,0 +1,6 @@
+{
+  "name": "Password Generator",
+  "short_name": "Generator",
+  "theme_color": "#6d84a2",
+  "display": "standalone"
+}
