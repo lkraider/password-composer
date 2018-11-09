@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Password Generator</title>
-		<link rel="manifest" href="manifest.json">
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -60,15 +59,19 @@
 
 		<script>
 			//This is the service worker with the Cache-first network
-			if (navigator.serviceWorker.controller) {
-			  console.log('[PWA Builder] active service worker found, no need to register')
+			if ('serviceWorker' in navigator) {
+				if (navigator.serviceWorker.controller) {
+					console.log('[PWA Builder] active service worker found, no need to register')
+				} else {
+					//Register the ServiceWorker
+					navigator.serviceWorker.register('sw.js', {
+						scope: './'
+					}).then(function(reg) {
+						console.log('Service worker has been registered for scope:'+ reg.scope);
+					});
+				}
 			} else {
-			  //Register the ServiceWorker
-			  navigator.serviceWorker.register('sw.js', {
-			    scope: './'
-			  }).then(function(reg) {
-			    console.log('Service worker has been registered for scope:'+ reg.scope);
-			  });
+				console.log('Service worker not supported');
 			}
 		</script>
 
@@ -397,6 +400,8 @@
 			}
 
 		</script>
+
+		<link rel="manifest" href="manifest.json">
 	</head>
 	<body>
 		<header class="toolbar">
