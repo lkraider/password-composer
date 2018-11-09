@@ -1,13 +1,13 @@
 //This is the service worker with the Cache-first network
 
-var CACHE = 'pwabuilder-precache';
+var CACHE = 'pwa-precache';
 var precacheManifest = 'pass.manifest';
 
 //Install stage sets up the cache-array to configure pre-cache content
 self.addEventListener('install', function(evt) {
-  console.log('[PWA Builder] The service worker is being installed.');
+  console.log('[PWA] The service worker is being installed.');
   evt.waitUntil(precache().then(function() {
-    console.log('[PWA Builder] Skip waiting on install');
+    console.log('[PWA] Skip waiting on install');
     return self.skipWaiting();
   }));
 });
@@ -15,12 +15,12 @@ self.addEventListener('install', function(evt) {
 
 //allow sw to control of current page
 self.addEventListener('activate', function(event) {
-  console.log('[PWA Builder] Claiming clients for current page');
+  console.log('[PWA] Claiming clients for current page');
   return self.clients.claim();
 });
 
 self.addEventListener('fetch', function(evt) {
-  console.log('[PWA Builder] The service worker is serving the asset: '+ evt.request.url);
+  console.log('[PWA] The service worker is serving the asset: '+ evt.request.url);
   evt.respondWith(fromCache(evt.request).catch(fromServer(evt.request)));
   evt.waitUntil(update(evt.request));
 });
@@ -32,7 +32,7 @@ function precache() {
       return response.text();
     }).then(function (text) {
       var precacheFiles = text.split("\n").slice(2);
-      console.log('[PWA Builder] Precache files: ' + precacheFiles);
+      console.log('[PWA] Precache files: ' + precacheFiles);
       return cache.addAll(precacheFiles);
     })
   });
