@@ -20,7 +20,7 @@ self.addEventListener('activate', function(event) {
 });
 
 self.addEventListener('fetch', function(evt) {
-  console.log('[PWA Builder] The service worker is serving the asset.'+ evt.request.url);
+  console.log('[PWA Builder] The service worker is serving the asset: '+ evt.request.url);
   evt.respondWith(fromCache(evt.request).catch(fromServer(evt.request)));
   evt.waitUntil(update(evt.request));
 });
@@ -32,7 +32,7 @@ function precache() {
       return response.text();
     }).then(function (text) {
       var precacheFiles = text.split("\n").slice(2);
-      console.log('[PWA Builder] Precache files:' + precacheFiles);
+      console.log('[PWA Builder] Precache files: ' + precacheFiles);
       return cache.addAll(precacheFiles);
     })
   });
@@ -41,6 +41,11 @@ function precache() {
 function fromCache(request) {
   //we pull files from the cache first thing so we can show them fast
   return caches.open(CACHE).then(function (cache) {
+    if (request.url.endsWith('/')) {
+      return cache.match('index.html').then(function (index) {
+        return index;
+      });
+    }
     return cache.match(request).then(function (matching) {
       return matching || Promise.reject('no-match');
     });
